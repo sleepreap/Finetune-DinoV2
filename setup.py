@@ -1,6 +1,6 @@
 from setuptools import setup, find_namespace_packages
 
-setup(name='Mask2Former',
+setup(name='DinoV2',
       python_requires=">=3.10",
       install_requires=[
           "transformers",
@@ -9,7 +9,6 @@ setup(name='Mask2Former',
           "lightning",
           "tqdm",
           "matplotlib",
-          "opencv-python",
-          "scipy"
+          "opencv-python"
       ],
       )
