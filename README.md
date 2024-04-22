@@ -26,7 +26,7 @@ Refer to the README file in the folder "Data" on where to upload the images and 
 2. set up the configs required in config.py
 3. run the train.py file
 
-A CSVlogger and the trained model file will be saved after the training has been completed. The model file would be saved as "Mask2Former.ckpt" in the same directory. An "output" folder will be created to store the contents of the CSVlogger.
+A CSVlogger and the trained model file will be saved after the training has been completed. The model file would be saved as "dinov2.ckpt" in the same directory. An "output" folder will be created to store the contents of the CSVlogger.
 
 ## Testing
 The testing is done using Mean-IOU, as well as pixel accuracy from the evaluate package. It will provide individual accuracy and IOU scores for each class label specified, as well as the mean accuracy and IOU scores of all the class labels. To run the test file, the model path of the trained model must be provided as an argument.
