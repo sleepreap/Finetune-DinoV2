@@ -1,8 +1,6 @@
 import pytorch_lightning as pl
 import torch
 from transformers import Dinov2Model
-#from transformers import Dinov2PreTrainedModel
-from transformers.modeling_outputs import SemanticSegmenterOutput
 from torch import nn
 import DinoV2.config as config
 from torch.nn.functional import interpolate
