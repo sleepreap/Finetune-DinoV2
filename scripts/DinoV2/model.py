@@ -99,17 +99,15 @@ class Dinov2Finetuner(pl.LightningModule):
             labels=batch["labels"],
         )
         loss = outputs.loss
-        original_images= batch["pixel_values"]
-        target_sizes = [(image.shape[1], image.shape[2]) for image in original_images]
         outputs = self(
              pixel_values=batch["pixel_values"],
             labels=batch["labels"],
         )
         loss = outputs.loss
         ground_truth = batch["original_segmentation_maps"]
-        ### Downsample prediction from 644x644 to 640x640
+        ### Downsample prediction from 644x644 to 640x640, which is the size of the image
         downsampled_logits = torch.nn.functional.interpolate(outputs.logits,
-                                                   size=target_sizes,
+                                                   size=[640,640],
                                                    mode="bilinear", align_corners=False)
         predicted_map = downsampled_logits.argmax(dim=1)
         results=predicted_map.squeeze().cpu().numpy()
