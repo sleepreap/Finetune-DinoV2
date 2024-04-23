@@ -9,6 +9,7 @@ setup(name='DinoV2',
           "lightning",
           "tqdm",
           "matplotlib",
-          "opencv-python"
+          "opencv-python",
+          "albumentations"
       ],
       )
