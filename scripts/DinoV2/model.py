@@ -98,8 +98,56 @@ class Dinov2Finetuner(pl.LightningModule):
             labels=batch["labels"],
         )
         loss = outputs.loss
-        self.log("loss", loss, sync_dist=True, batch_size=batch_size)
-        return loss
+        orignial_images= batch["pixel_values"]
+        target_sizes = [(image.shape[1], image.shape[2]) for image in original_images]
+        outputs = self(
+             pixel_values=batch["pixel_values"],
+            labels=batch["labels"],
+        )
+        loss = outputs.loss
+        ground_truth = batch["original_segmentation_maps"]
+        ### Downsample prediction from 644x644 to 640x640
+        downsampled_logits = torch.nn.functional.interpolate(outputs.logits,
+                                                   size=target_sizes,
+                                                   mode="bilinear", align_corners=False)
+        predicted_map = downsampled_logits.argmax(dim=1)
+        results=predicted_map.squeeze().cpu().numpy()
+        
+        # Calculate FN and FP
+        false_negatives = np.sum((results == 0) & (ground_truth[0] == 1))
+        false_positives = np.sum((results == 1) & (ground_truth[0] == 0))
+        
+        # Total number of instances
+        total_instances = np.prod(results.shape)
+        
+        # Calculate percentages
+        percentage_fn = (false_negatives / total_instances) 
+        percentage_fp = (false_positives / total_instances) 
+        
+        metrics = self.train_mean_iou._compute(
+            predictions=results,
+            references=ground_truth[0],
+            num_labels=self.num_classes,
+            ignore_index=254,
+            reduce_labels=False,
+        )
+        # Extract per category metrics and convert to list if necessary (pop before defining the metrics dictionary)
+        per_category_accuracy = metrics.pop("per_category_accuracy").tolist()
+        per_category_iou = metrics.pop("per_category_iou").tolist()
+        
+        # Re-define metrics dict to include per-category metrics directly
+        metrics = {
+            'loss': loss, 
+            "mean_iou": metrics["mean_iou"], 
+            "mean_accuracy": metrics["mean_accuracy"],
+            "False Negative": percentage_fn,
+            "False Positive": percentage_fp,
+            **{f"accuracy_{self.id2label[i]}": v for i, v in enumerate(per_category_accuracy)},
+            **{f"iou_{self.id2label[i]}": v for i, v in enumerate(per_category_iou)}
+        }
+        for k,v in metrics.items():
+            self.log(k,v,sync_dist=True,batch_size=batch_size)
+        return(metrics)
         
     def configure_optimizers(self):
         return torch.optim.Adam([p for p in self.parameters() if p.requires_grad], lr=self.lr)
