@@ -5,10 +5,9 @@ torch.set_float32_matmul_precision("medium")
 import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from mask2former.model import Mask2FormerFinetuner
-from mask2former.dataset import SegmentationDataModule
-import mask2former.config as config
-from transformers import AutoImageProcessor
+from DinoV2.model import Dinov2Finetuner
+from DinoV2.dataset import SegmentationDataModule
+import DinoV2.config as config
 from torch import nn
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,21 +17,23 @@ from colorPalette import color_palette
 from colorPalette import apply_palette
 
 def dataset_predictions(dataloader):
-    pred_set=[]
+    pred_set = []
     label_set=[]
     prog_bar = tqdm(dataloader, desc="Doing predictions", total=len(dataloader))
     for data in prog_bar:
         original_images = data["original_images"]
         original_lables=data['original_segmentation_maps']
-        target_sizes = [(image.shape[1], image.shape[2]) for image in original_images]
-        pixel_values = data['pixel_values'].to(device)
-        mask_labels = [mask_label.to(device) for mask_label in data['mask_labels']]
-        class_labels = [class_label.to(device) for class_label in data['class_labels']]
-        outputs = model(pixel_values=pixel_values, mask_labels=mask_labels, class_labels=class_labels)
-        pred_maps = processor.post_process_semantic_segmentation(outputs, target_sizes=target_sizes)
-        
-        for pred in pred_maps:
-            pred_set.append(pred.cpu().numpy())
+        outputs = model(
+        pixel_values=data["pixel_values"].to(device),
+        labels= data["labels"].to(device),
+        )
+        downsampled_logits = torch.nn.functional.interpolate(outputs.logits,
+                                                   size=[640,640],
+                                                   mode="bilinear", align_corners=False)
+        downsampled_map = downsampled_logits.argmax(dim=1)
+        for i in range(downsampled_map.size(0)):  # Iterate over each image in the batch
+            pred_map = downsampled_map[i].squeeze().detach().cpu().numpy()
+            pred_set.append(pred_map)  # Append each image individually to pred_set
         for label in original_lables:
             label_set.append(label)
     return pred_set, label_set
@@ -84,8 +85,7 @@ if __name__=="__main__":
         os.makedirs(save_path)
         
     data_module = SegmentationDataModule(dataset_dir=config.DATASET_DIR, batch_size=config.BATCH_SIZE, num_workers=config.NUM_WORKERS)
-    model = Mask2FormerFinetuner.load_from_checkpoint(model_path,id2label=config.ID2LABEL, lr=config.LEARNING_RATE)
-    processor = AutoImageProcessor.from_pretrained("facebook/mask2former-swin-small-ade-semantic")
+    model = Dinov2Finetuner.load_from_checkpoint(model_path,id2label=config.ID2LABEL, lr=config.LEARNING_RATE)
     model.eval()
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model.to(device)
