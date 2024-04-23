@@ -1,19 +1,19 @@
 # Finetuning DinoV2 on custom Dataset
 
 ## Introduction
-DINOv2: A Self-supervised Vision Transformer Model
+DINOV2: A Self-supervised Vision Transformer Model
 
 A family of foundation models producing universal features suitable for image-level visual tasks (image classification, instance retrieval, video understanding) as well as pixel-level visual tasks (depth estimation, semantic segmentation).
 
-### [DINOv2 Project page](https://github.com/facebookresearch/dinov2) | [DINOv2 Paper] (https://arxiv.org/abs/2304.07193) | 
+### [DINOV2 Project page](https://github.com/facebookresearch/dinov2) | [DINOV2 Paper] (https://arxiv.org/abs/2304.07193) | 
 ### [Run our demo: ](https://dinov2.metademolab.com/)
-### [DINOv2 Hugging Face](https://huggingface.co/docs/transformers/en/model_doc/dinov2)
+### [DINOV2 Hugging Face](https://huggingface.co/docs/transformers/en/model_doc/dinov2)
 
 ## Purpose
 The purpose of this document is to build a process of finetuning DINOv2 for custom dataset on semantic segmentation. The code is done using Pytorch Lightning and the model can be imported from hugging face.
 
-1. Create a virtual environment: `conda create -n Dinov2 python=3.10 -y` and `conda activate Dinov2 `
-2. Install [Pytorch CUDA 11.8](https://pytorch.org/): ` pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`
+1. Create a virtual environment: `conda create -n DinoV2 python=3.10 -y` and `conda activate DinoV2 `
+2. Install [Pytorch CUDA 11.8](https://pytorch.org/): ` pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 `
 3. Download code: `git clone https://github.com/sleepreap/Finetune-DinoV2.git` 
 4. `cd Finetune-DinoV2` and run `pip install -e .`
 
@@ -26,7 +26,7 @@ Refer to the README file in the folder "Data" on where to upload the images and 
 2. set up the configs required in config.py
 3. run the train.py file
 
-A CSVlogger and the trained model file will be saved after the training has been completed. The model file would be saved as "dinov2.ckpt" in the same directory. An "output" folder will be created to store the contents of the CSVlogger.
+A CSVlogger and the trained model file will be saved after the training has been completed. The model file would be saved as "DinoV2.ckpt" in the same directory. An "output" folder will be created to store the contents of the CSVlogger.
 
 ## Testing
 The testing is done using Mean-IOU, as well as pixel accuracy from the evaluate package. It will provide individual accuracy and IOU scores for each class label specified, as well as the mean accuracy and IOU scores of all the class labels. To run the test file, the model path of the trained model must be provided as an argument.
@@ -35,7 +35,7 @@ The testing is done using Mean-IOU, as well as pixel accuracy from the evaluate 
 2. run the test.py file using this command: python test.py --model_path MODEL_PATH
    
 ```bash
-e.g python test.py --model_path dinov2.ckpt
+e.g python test.py --model_path DinoV2.ckpt
 ```
 
 ## Utilities
