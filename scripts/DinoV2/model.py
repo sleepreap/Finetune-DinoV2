@@ -99,7 +99,7 @@ class Dinov2Finetuner(pl.LightningModule):
             labels=batch["labels"],
         )
         loss = outputs.loss
-        orignial_images= batch["pixel_values"]
+        original_images= batch["pixel_values"]
         target_sizes = [(image.shape[1], image.shape[2]) for image in original_images]
         outputs = self(
              pixel_values=batch["pixel_values"],
