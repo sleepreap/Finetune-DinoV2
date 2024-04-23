@@ -32,8 +32,6 @@ def dataset_predictions(dataloader):
       for i in range(downsampled_map.size(0)):  # Iterate over each image in the batch
             pred_map = downsampled_map[i].squeeze().detach().cpu().numpy()
             pred_set.append(pred_map)  # Append each image individually to pred_set
-      #pred_maps=downsampled_map.squeeze().detach().cpu().numpy()
-      #pred_set.append(pred_maps)
     return pred_set
     
 
