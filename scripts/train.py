@@ -2,7 +2,7 @@ import pytorch_lightning as pl
 import torch
 torch.manual_seed(1)
 torch.set_float32_matmul_precision("medium")
-from DinoV2model import Dinov2Finetuner
+from DinoV2.model import Dinov2Finetuner
 from DinoV2.dataset import SegmentationDataModule
 import DinoV2.config as config
 
