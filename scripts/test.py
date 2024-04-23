@@ -2,9 +2,9 @@ import pytorch_lightning as pl
 import torch
 torch.manual_seed(1)
 torch.set_float32_matmul_precision("medium")
-from mask2former.model import Mask2FormerFinetuner
-from mask2former.dataset import SegmentationDataModule
-import mask2former.config as config
+from DinoV2.model import Mask2FormerFinetuner
+from DinoV2.dataset import SegmentationDataModule
+import DinoV2config as config
 import argparse
 
 
