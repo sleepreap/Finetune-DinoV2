@@ -81,7 +81,7 @@ class Dinov2Finetuner(pl.LightningModule):
             labels=batch["labels"],
         )
         loss = outputs.loss
-        self.log("loss", loss, sync_dist=True, batch_size=batch_size)
+        self.log("loss", loss, sync_dist=True, batch_size=config.BATCH_SIZE)
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -90,7 +90,7 @@ class Dinov2Finetuner(pl.LightningModule):
             labels= batch["labels"],
         )
         loss = outputs.loss
-        self.log("loss", loss, sync_dist=True, batch_size=batch_size)
+        self.log("loss", loss, sync_dist=True, batch_size=config.BATCH_SIZE)
         return loss
         
     def test_step(self, batch, batch_idx):
