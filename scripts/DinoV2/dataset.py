@@ -5,13 +5,14 @@ import numpy as np
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader 
 import albumentations as A
+import torch
 
-ADE_MEAN = np.array([123.675, 116.280, 103.530]) / 255
-ADE_STD = np.array([58.395, 57.120, 57.375]) / 255
+#ADE_MEAN = [0.485, 0.456, 0.406]
+#ADE_STD = [0.229, 0.224, 0.225]
 
 normalization= A.Compose([
     A.Resize(width=644, height=644),
-    A.Normalize(mean=ADE_MEAN, std=ADE_STD),
+    A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 
 class ImageSegmentationDataset(Dataset):
@@ -71,7 +72,7 @@ class SegmentationDataModule(pl.LightningDataModule):
     def test_dataloader(self):
         return DataLoader(self.test_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers, collate_fn=self.collate_fn)
         
-    def collate_fn(inputs):
+    def collate_fn(self,inputs):
         batch = dict()
         batch["pixel_values"] = torch.stack([i[0] for i in inputs], dim=0) 
         batch["labels"] = torch.stack([i[1] for i in inputs], dim=0)
