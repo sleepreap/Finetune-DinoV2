@@ -95,11 +95,6 @@ class Dinov2Finetuner(pl.LightningModule):
         
     def test_step(self, batch, batch_idx):
         outputs = self(
-            pixel_values=batch["pixel_values"],
-            labels=batch["labels"],
-        )
-        loss = outputs.loss
-        outputs = self(
              pixel_values=batch["pixel_values"],
             labels=batch["labels"],
         )
