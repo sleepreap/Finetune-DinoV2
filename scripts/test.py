@@ -2,7 +2,7 @@ import pytorch_lightning as pl
 import torch
 torch.manual_seed(1)
 torch.set_float32_matmul_precision("medium")
-from DinoV2.model import Mask2FormerFinetuner
+from DinoV2.model import Dinov2Finetuner
 from DinoV2.dataset import SegmentationDataModule
 import DinoV2config as config
 import argparse
@@ -20,7 +20,7 @@ if __name__=="__main__":
     args = parser.parse_args()
     model_path = args.model_path
     data_module = SegmentationDataModule(dataset_dir=config.DATASET_DIR, batch_size=config.BATCH_SIZE, num_workers=config.NUM_WORKERS)
-    model = Mask2FormerFinetuner.load_from_checkpoint(model_path,id2label=config.ID2LABEL, lr=config.LEARNING_RATE)
+    model = Dinov2Finetuner.load_from_checkpoint(model_path,id2label=config.ID2LABEL, lr=config.LEARNING_RATE)
 
     trainer = pl.Trainer(
         logger=config.LOGGER,
