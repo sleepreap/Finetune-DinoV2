@@ -1,9 +1,10 @@
 import pytorch_lightning as pl
 import torch
-from transformers import Dinov2Model, Dinov2PreTrainedModel
+from transformers import Dinov2Model
+#from transformers import Dinov2PreTrainedModel
 from transformers.modeling_outputs import SemanticSegmenterOutput
 from torch import nn
-import mask2former.config as config
+import DinoV2.config as config
 from torch.nn.functional import interpolate
 from torch.nn import CrossEntropyLoss
 import evaluate
