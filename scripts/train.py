@@ -2,24 +2,34 @@ import pytorch_lightning as pl
 import torch
 torch.manual_seed(1)
 torch.set_float32_matmul_precision("medium")
-from DinoV2.model import Dinov2Finetuner
-from DinoV2.dataset import SegmentationDataModule
-import DinoV2.config as config
+from DinoV2 import ( Dinov2Finetuner, 
+                        SegmentationDataModule, 
+                        DATASET_DIR, 
+                        BATCH_SIZE, 
+                        NUM_WORKERS, 
+                        ID2LABEL, 
+                        LEARNING_RATE, 
+                        LOGGER, 
+                        PRECISION, 
+                        DEVICES, 
+                        EARLY_STOPPING_CALLBACK, 
+                        CHECKPOINT_CALLBACK, 
+                        EPOCHS )
 from pytorch_lightning.strategies import DDPStrategy
 
 
 if __name__=="__main__":
-    data_module = SegmentationDataModule(dataset_dir=config.DATASET_DIR, batch_size=config.BATCH_SIZE, num_workers=config.NUM_WORKERS)
-    model=Dinov2Finetuner(config.ID2LABEL, config.LEARNING_RATE)
+    data_module = SegmentationDataModule(dataset_dir=DATASET_DIR, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS)
+    model=Dinov2Finetuner(ID2LABEL, LEARNING_RATE)
 
     trainer = pl.Trainer(
-        logger=config.LOGGER,
-        precision=config.PRECISION,
+        logger=LOGGER,
+        precision=PRECISION,
         accelerator='cuda',
-        devices=config.DEVICES,
+        devices=DEVICES,
         strategy=DDPStrategy(find_unused_parameters=True),
-        callbacks=[config.EARLY_STOPPING_CALLBACK, config.CHECKPOINT_CALLBACK],
-        max_epochs=config.EPOCHS
+        callbacks=[EARLY_STOPPING_CALLBACK, CHECKPOINT_CALLBACK],
+        max_epochs=EPOCHS
     )
     print("Training starts!!")
     trainer.fit(model,data_module)
