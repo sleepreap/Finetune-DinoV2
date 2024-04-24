@@ -82,15 +82,6 @@ class Dinov2Finetuner(pl.LightningModule):
         loss = outputs.loss
         self.log("loss", loss, sync_dist=True, batch_size=config.BATCH_SIZE)
         return loss
-        
-    def on_train_start(self):
-        self.start_time = time.time()
-
-    def on_train_end(self):
-        total_time = time.time() - self.start_time
-        metrics = {'final_epoch': self.current_epoch, 'training_time': total_time}
-        with open('mask2former_hyperparameters.json', 'w') as f:
-            json.dump(metrics, f)
 
     def validation_step(self, batch, batch_idx):
         outputs = self(
@@ -101,14 +92,23 @@ class Dinov2Finetuner(pl.LightningModule):
         self.log("loss", loss, sync_dist=True, batch_size=config.BATCH_SIZE)
         return loss
         
+    def on_train_start(self):
+        self.start_time = time.time()
+
+    def on_train_end(self):
+        total_time = time.time() - self.start_time
+        metrics = {'final_epoch': self.current_epoch, 'training_time': total_time}
+        with open('mask2former_hyperparameters.json', 'w') as f:
+            json.dump(metrics, f)
+        
     def test_step(self, batch, batch_idx):
         outputs = self(
-             pixel_values=batch["pixel_values"],
+            pixel_values=batch["pixel_values"],
             labels=batch["labels"],
         )
         loss = outputs.loss
         ground_truth = batch["original_segmentation_maps"]
-        ### Downsample prediction from 644x644 to 640x640, which is the size of the image
+        ### Downsample prediction from 644x644 to 640x640
         downsampled_logits = torch.nn.functional.interpolate(outputs.logits,
                                                    size=[640,640],
                                                    mode="bilinear", align_corners=False)
