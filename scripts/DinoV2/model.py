@@ -82,6 +82,15 @@ class Dinov2Finetuner(pl.LightningModule):
         loss = outputs.loss
         self.log("loss", loss, sync_dist=True, batch_size=config.BATCH_SIZE)
         return loss
+        
+    def on_train_start(self):
+        self.start_time = time.time()
+
+    def on_train_end(self):
+        total_time = time.time() - self.start_time
+        metrics = {'final_epoch': self.current_epoch, 'training_time': total_time}
+        with open('mask2former_hyperparameters.json', 'w') as f:
+            json.dump(metrics, f)
 
     def validation_step(self, batch, batch_idx):
         outputs = self(
