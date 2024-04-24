@@ -5,16 +5,19 @@ torch.set_float32_matmul_precision("medium")
 import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from DinoV2.model import Dinov2Finetuner
-from DinoV2.dataset import SegmentationDataModule
-import DinoV2.config as config
+from DinoV2 import ( Dinov2Finetuner, 
+                        SegmentationDataModule, 
+                        DATASET_DIR, 
+                        BATCH_SIZE, 
+                        NUM_WORKERS, 
+                        ID2LABEL, 
+                        LEARNING_RATE)
 from torch import nn
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 from tqdm import tqdm
-from colorPalette import color_palette
-from colorPalette import apply_palette
+from colorPalette import color_palette, apply_palette
 
 def dataset_predictions(dataloader):
     pred_set = []
@@ -62,7 +65,6 @@ def savePredictions(pred_set, label_set, save_path):
 
 
 if __name__=="__main__":
-    data_module = SegmentationDataModule(dataset_dir=config.DATASET_DIR, batch_size=config.BATCH_SIZE, num_workers=config.NUM_WORKERS)
     parser = argparse.ArgumentParser()
     parser.add_argument(
     '--model_path',
@@ -84,8 +86,8 @@ if __name__=="__main__":
     if not os.path.exists(save_path):
         os.makedirs(save_path)
         
-    data_module = SegmentationDataModule(dataset_dir=config.DATASET_DIR, batch_size=config.BATCH_SIZE, num_workers=config.NUM_WORKERS)
-    model = Dinov2Finetuner.load_from_checkpoint(model_path,id2label=config.ID2LABEL, lr=config.LEARNING_RATE)
+    data_module = SegmentationDataModule(dataset_dir=DATASET_DIR, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS)
+    model = Dinov2Finetuner.load_from_checkpoint(model_path,id2label=ID2LABEL, lr=LEARNING_RATE)
     model.eval()
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model.to(device)
