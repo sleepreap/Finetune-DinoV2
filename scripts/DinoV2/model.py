@@ -46,8 +46,6 @@ class Dinov2Finetuner(pl.LightningModule):
         self.classifier = LinearClassifier(self.model.config.hidden_size, 46, 46, self.model.config.num_labels)
         
         evaluate.load
-        self.train_mean_iou = evaluate.load("mean_iou")
-        self.val_mean_iou = evaluate.load("mean_iou")
         self.test_mean_iou = evaluate.load("mean_iou")
 
     def forward(self, pixel_values, output_hidden_states=False, output_attentions=False, labels=None):
@@ -152,4 +150,4 @@ class Dinov2Finetuner(pl.LightningModule):
         return(metrics)
         
     def configure_optimizers(self):
-        return torch.optim.Adam([p for p in self.parameters() if p.requires_grad], lr=self.lr)
+        return torch.optim.AdamW([p for p in self.parameters() if p.requires_grad], lr=self.lr)
