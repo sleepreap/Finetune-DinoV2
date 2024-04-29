@@ -78,7 +78,7 @@ class Dinov2Finetuner(pl.LightningModule):
             labels=batch["labels"],
         )
         loss = outputs.loss
-        self.log("loss", loss, sync_dist=True, batch_size=config.BATCH_SIZE)
+        self.log("trainLoss", loss, sync_dist=True, batch_size=config.BATCH_SIZE)
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -87,7 +87,7 @@ class Dinov2Finetuner(pl.LightningModule):
             labels= batch["labels"],
         )
         loss = outputs.loss
-        self.log("loss", loss, sync_dist=True, batch_size=config.BATCH_SIZE)
+        self.log("valLoss", loss, sync_dist=True, batch_size=config.BATCH_SIZE)
         return loss
         
     def on_train_start(self):
@@ -124,7 +124,7 @@ class Dinov2Finetuner(pl.LightningModule):
         percentage_fn = (false_negatives / total_instances) 
         percentage_fp = (false_positives / total_instances) 
         
-        metrics = self.train_mean_iou._compute(
+        metrics = self.test_mean_iou._compute(
             predictions=results,
             references=ground_truth[0],
             num_labels=self.num_classes,
@@ -137,7 +137,7 @@ class Dinov2Finetuner(pl.LightningModule):
         
         # Re-define metrics dict to include per-category metrics directly
         metrics = {
-            'loss': loss, 
+            'testLoss': tloss, 
             "mean_iou": metrics["mean_iou"], 
             "mean_accuracy": metrics["mean_accuracy"],
             "False Negative": percentage_fn,
