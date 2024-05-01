@@ -5,7 +5,7 @@ import sys
 import os
 
 #Training hyperparmeters
-LEARNING_RATE=0.0001
+LEARNING_RATE=0.00005
 EPOCHS=100
 PRECISION="16-mixed"
 DEVICES=[1,2,3]
