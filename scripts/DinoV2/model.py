@@ -113,8 +113,6 @@ class Dinov2Finetuner(pl.LightningModule):
                                                  mode="bilinear", align_corners=False)
       predicted_map = downsampled_logits.argmax(dim=1)
       results=predicted_map.cpu().numpy()
-      print("ground_truth shape:", ground_truth.shape)
-      print("results shape:", results.shape)
       # Calculate FN and FP
       false_negatives = np.sum((results == 0) & (ground_truth[0] == 1))
       false_positives = np.sum((results == 1) & (ground_truth[0] == 0))
