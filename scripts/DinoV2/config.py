@@ -7,15 +7,7 @@ import os
 #Training hyperparmeters
 LEARNING_RATE=0.0001
 EPOCHS=180
-PRECISION="16-mixed"
 DEVICES=[2,3]
-EARLY_STOPPING_CALLBACK = EarlyStopping(
-    monitor="valLoss",
-    min_delta=0.00,
-    patience=55,
-    verbose=True,
-    mode="min",
-)
 CHECKPOINT_CALLBACK = ModelCheckpoint(save_top_k=1, 
                                       monitor="valLoss", 
                                       every_n_epochs=1,  # Save the model at every epoch 
