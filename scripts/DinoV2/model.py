@@ -87,7 +87,9 @@ class Dinov2Finetuner(pl.LightningModule):
             labels= batch["labels"],
         )
         loss = outputs.loss
-        self.log("valLoss", loss, sync_dist=True, batch_size=config.BATCH_SIZE)
+        self.log("valLoss", loss, sync_dist=True,  batch_size=config.BATCH_SIZE, on_epoch=True,logger=True, prog_bar=True)
+        lr = self.trainer.optimizers[0].param_groups[0]['lr']
+        self.log("learning_rate", lr, sync_dist=True, batch_size=config.BATCH_SIZE, on_epoch=True, logger=True, prog_bar=True)
         return loss
         
     def on_train_start(self):
@@ -150,4 +152,14 @@ class Dinov2Finetuner(pl.LightningModule):
       return(metrics)
     
     def configure_optimizers(self):
-        return torch.optim.AdamW([p for p in self.parameters() if p.requires_grad], lr=self.lr)
+        # AdamW optimizer with specified learning rate
+        optimizer = torch.optim.AdamW([p for p in self.parameters() if p.requires_grad], lr=self.lr)
+      
+        # ReduceLROnPlateau scheduler
+        scheduler = {
+            'scheduler': torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=config.FACTOR, patience=config.PATIENCE),
+            'reduce_on_plateau': True,  # Necessary for ReduceLROnPlateau
+            'monitor': 'valLoss'  # Metric to monitor for reducing learning rate
+        }
+        return {'optimizer': optimizer, 'lr_scheduler': scheduler}
+        
